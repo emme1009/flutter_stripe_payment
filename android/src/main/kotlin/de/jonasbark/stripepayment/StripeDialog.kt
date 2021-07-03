@@ -1,6 +1,6 @@
 package de.jonasbark.stripepayment
 
-import android.app.DialogFragment
+import androidx.fragment.app.DialogFragment
 import android.content.DialogInterface
 import android.graphics.Color.TRANSPARENT
 import android.graphics.drawable.ColorDrawable
@@ -64,9 +64,9 @@ class StripeDialog : DialogFragment() {
         setStyle(STYLE_NO_TITLE, R.style.Theme_AppCompat_Light_Dialog)
     }
 
-    override fun onCancel(dialog: DialogInterface?) {
-        super.onCancel(dialog)
+    override fun onCancel(dialog: DialogInterface) {
         onCancelListener.onCancel(dialog)
+        super.onCancel(dialog)
     }
 
     lateinit var onCancelListener: DialogInterface.OnCancelListener
@@ -79,20 +79,21 @@ class StripeDialog : DialogFragment() {
 
         if (mCardInputWidget.validateAllFields()) {
 
-            mCardInputWidget.card?.let { card ->
+            mCardInputWidget.cardParams?.let { card ->
 
                 view?.findViewById<View>(R.id.progress)?.visibility = View.VISIBLE
                 view?.findViewById<View>(R.id.buttonSave)?.visibility = View.GONE
                 view?.findViewById<View>(R.id.buttonCancel)?.visibility = View.GONE
 
-                val paymentMethodParamsCard = card.toPaymentMethodParamsCard()
-                val paymentMethodCreateParams = PaymentMethodCreateParams.create(
+                //val paymentMethodParamsCard = card.toPaymentMethodParamsCard()
+                val paymentMethodParamsCard = PaymentMethodCreateParams.createCard(card)
+                /*val paymentMethodCreateParams = PaymentMethodCreateParams.create(
                     paymentMethodParamsCard,
                     PaymentMethod.BillingDetails.Builder().build()
-                )
+                )*/
 
                 stripeInstance.createPaymentMethod(
-                    paymentMethodCreateParams,
+                        paymentMethodParamsCard,
                     null,
                     arguments?.getString("stripeAccountId", null),
                     object : ApiResultCallback<PaymentMethod> {
